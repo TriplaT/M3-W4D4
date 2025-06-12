@@ -13,10 +13,10 @@ public class PlayerAnimation : MonoBehaviour
 
     void Update()
     {
-        Vector2 dir = controller.Direction;
+        //Vector2 dir = controller.Direction;
 
-        animator.SetBool("isWalking", dir.magnitude > 0);
-        animator.SetFloat("DirX", dir.x);
-        animator.SetFloat("DirY", dir.y);
+        //animator.SetBool("isWalking", dir.magnitude > 0);
+        //animator.SetFloat("DirX", dir.x);
+        //animator.SetFloat("DirY", dir.y);
     }
 }

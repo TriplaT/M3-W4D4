@@ -1,30 +1,52 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private float speed = 5f;
+    [SerializeField] private float speed = 1f;
+    [SerializeField] private float collisionOffset = 0.05f;
+    Rigidbody2D rb;
+    Vector2 movementInput;
+    [SerializeField] private ContactFilter2D movementFilter;
+    List<RaycastHit2D> castCollision = new List<RaycastHit2D>();
 
-    private float horizontal;
-    private float vertical;
-    private Rigidbody2D rb;
-
-    public Vector2 Direction { get; private set; }
-
-    void Start()
-    {
+    void Start(){
         rb = GetComponent<Rigidbody2D>();
     }
 
-    void Update()
-    {
-        horizontal = Input.GetAxisRaw("Horizontal");
-        vertical = Input.GetAxisRaw("Vertical");
-        Direction = new Vector2(horizontal, vertical).normalized;
+    void Update(){
+
     }
 
-    void FixedUpdate()
-    {
-        rb.MovePosition(rb.position + Direction * speed * Time.fixedDeltaTime);
+    private void FixedUpdate(){
+
+        if (movementInput != Vector2.zero){
+            bool success = TryMove(movementInput);
+            if (!success){
+                success = TryMove(new Vector2(movementInput.x, 0));
+                if (!success){
+                    success = TryMove(new Vector2(0,movementInput.y));
+                }
+            }
+        }
+    } 
+    private bool TryMove(Vector2 direction){
+        int Count = rb.Cast(direction,
+                            movementFilter,
+                            castCollision,
+                            speed * Time.fixedDeltaTime + collisionOffset);
+        if (Count == 0){
+            rb.MovePosition(rb.position + direction * speed * Time.fixedDeltaTime);
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    void OnMove(InputValue movementValue){
+        movementInput = movementValue.Get <Vector2>();
     }
 }
